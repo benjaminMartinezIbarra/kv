@@ -2,6 +2,8 @@
 
 **TODO: Add description**
 
+Simple application showcasing features of OTP processes for a simple Keys/Values Model.
+
 ## Installation
 
 If [available in Hex](https://hex.pm/docs/publish), the package can be installed
