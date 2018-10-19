@@ -1,5 +1,5 @@
 defmodule KV.Bucket do
-  use Agent
+  use Agent, restart: :temporary  #If they crash, regardless of the reason, they should not be restarted.
   @moduledoc """
   simple bucket module to put values and retrive it from a bucket
   use of Agents to protect and handle state for us
