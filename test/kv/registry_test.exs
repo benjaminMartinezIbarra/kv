@@ -1,9 +1,18 @@
 defmodule KV.RegistryTest do
   use ExUnit.Case, async: true
 
-  setup do
-    registry = start_supervised!(KV.Registry)
-    %{registry: registry}
+
+  @doc """
+   setup do
+      registry = start_supervised!(KV.Registry)
+      %{registry: registry}
+    end
+"""
+
+
+  setup context do
+    _ = start_supervised!({KV.Registry, name: context.test})
+    %{registry: context.test}
   end
 
   test "spawns buckets", %{registry: registry} do
