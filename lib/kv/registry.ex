@@ -13,7 +13,7 @@ defmodule KV.Registry do
   def start_link(opts) do
     # 1. Pass the name to GenServer's init
     server = Keyword.fetch!(opts, :name)
-    GenServer.start_link(__MODULE__, :server, opts)
+    GenServer.start_link(__MODULE__, server, opts)
   end
 
   @doc """
@@ -35,7 +35,7 @@ defmodule KV.Registry do
   Ensures there is a bucket associated with the given `name` in `server`.
   """
   def create(server, name) do
-    GenServer.cast(server, {:create, name})
+    GenServer.call(server, {:create, name})
   end
 
   @doc """
@@ -47,9 +47,9 @@ defmodule KV.Registry do
 
   ## Server Callbacks
 
-  def init(table_name) do
+  def init(table) do
     # 3. We have replaced the names map by the ETS table
-    names = :ets.new(table_name, [:named_table, read_concurrency: true])
+    names = :ets.new(table, [:named_table, read_concurrency: true])
     refs  = %{}
     {:ok, {names, refs}}
   end
@@ -79,7 +79,7 @@ defmodule KV.Registry do
 
 
 
-  def handle_cast({:create, name}, {names, refs}) do
+  def handle_call({:create, name}, _from, {names, refs}) do
     # 5. Read and write to the ETS table instead of the map
     case lookup(names, name) do
       {:ok, _pid} ->
@@ -89,7 +89,7 @@ defmodule KV.Registry do
         ref = Process.monitor(pid)
         refs = Map.put(refs, ref, name)
         :ets.insert(names, {name, pid})
-        {:noreply, {names, refs}}
+        {:reply, pid, {names, refs}}
     end
   end
 
